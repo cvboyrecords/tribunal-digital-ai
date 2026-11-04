@@ -25,10 +25,19 @@ const translations = {
     dashboardTab: "Painel Judicial de Triagem",
     verifyTab: "Verificação de Autenticidade (QR / Hash)",
     formLawyer: "Nome / Cédula Profissional do Advogado",
+    lawyerPlaceholder: "Ex: Dr. Carlos Semedo (CP-CV 8492)",
     formLawyerEmail: "E-mail Institucional do Mandatário",
     formApplicant: "Requerente (Autor)",
+    applicantPlaceholder: "Nome do Requerente / Empresa",
     formRespondent: "Requerido (Réu)",
+    respondentPlaceholder: "Nome do Requerido / Estado",
     formCategory: "Tipo de Ação / Categoria Jurídica",
+    categories: [
+      "Providência Cautelar Urgente (Apreensão / Suspensão)",
+      "Ação Ordinária Cível",
+      "Contencioso Administrativo e Fiscal",
+      "Habeas Corpus / Garantias Constitucionais"
+    ],
     formFile: "Anexar Peça Processual (PDF Autenticado)",
     formSubmit: "Submeter Petição e Gerar Hash SHA-256",
     successTitle: "Petição Submetida e Autenticada com Sucesso",
@@ -53,10 +62,19 @@ const translations = {
     dashboardTab: "Judicial Triage Dashboard",
     verifyTab: "Authenticity Verification (QR / Hash)",
     formLawyer: "Lawyer Name / Bar Association ID",
+    lawyerPlaceholder: "Ex: Adv. Johnathan Sterling (Bar ID #8492)",
     formLawyerEmail: "Official Lawyer Email",
     formApplicant: "Applicant / Plaintiff",
+    applicantPlaceholder: "Plaintiff Name / Corporation",
     formRespondent: "Respondent / Defendant",
+    respondentPlaceholder: "Defendant Name / State",
     formCategory: "Legal Action Type / Category",
+    categories: [
+      "Emergency Injunction (Seizure / Suspension)",
+      "Civil Claim / Ordinary Action",
+      "Administrative & Tax Litigation",
+      "Habeas Corpus / Constitutional Rights"
+    ],
     formFile: "Attach Legal Filing (Authenticated PDF)",
     formSubmit: "Submit Filing & Generate SHA-256 Hash",
     successTitle: "Filing Successfully Submitted and Authenticated",
@@ -81,10 +99,19 @@ const translations = {
     dashboardTab: "Tableau de Bord Judiciaire",
     verifyTab: "Vérification d'Authenticité (QR / Hash)",
     formLawyer: "Nom / N° d'Abonnement de l'Avocat",
+    lawyerPlaceholder: "Ex: Me. Jean Dupont (Toque 8492)",
     formLawyerEmail: "E-mail Officiel du Mandataire",
     formApplicant: "Demandeur",
-    formRespondent: "Défendeur",
+    applicantPlaceholder: "Nom du Demandeur / Société",
+    formRespondent: "Défenseur",
+    respondentPlaceholder: "Nom du Défendeur / État",
     formCategory: "Nature de l'Action / Catégorie",
+    categories: [
+      "Référé d'Urgence (Saisie / Suspension)",
+      "Action Civile Ordinaire",
+      "Contentieux Administratif et Fiscal",
+      "Habeas Corpus / Garanties Constitutionnelles"
+    ],
     formFile: "Joindre l'Acte Procédural (PDF Authentifié)",
     formSubmit: "Soumettre et Générer le Hash SHA-256",
     successTitle: "Acte Soumis et Authentifié avec Succès",
@@ -109,10 +136,19 @@ const translations = {
     dashboardTab: "Panel Judicial de Triaje",
     verifyTab: "Verificación de Autenticidad (QR / Hash)",
     formLawyer: "Nombre / Nº de Colegiado del Abogado",
+    lawyerPlaceholder: "Ex: Dr. Alejandro Gomez (Col. 8492)",
     formLawyerEmail: "Correo Oficial del Abogado",
     formApplicant: "Demandante",
+    applicantPlaceholder: "Nombre del Demandante / Empresa",
     formRespondent: "Demandado",
+    respondentPlaceholder: "Nombre del Demandado / Estado",
     formCategory: "Tipo de Acción / Categoría Jurídica",
+    categories: [
+      "Medida Cautelar Urgente (Embargo / Suspensión)",
+      "Acción Civil Ordinaria",
+      "Contencioso Administrativo y Fiscal",
+      "Habeas Corpus / Garantías Constitucionales"
+    ],
     formFile: "Adjuntar Documento Judicial (PDF Autenticado)",
     formSubmit: "Presentar y Generar Hash SHA-256",
     successTitle: "Escrito Presentado y Autenticado con Éxito",
@@ -137,10 +173,19 @@ const translations = {
     dashboardTab: "لوحة الفرز القضائي",
     verifyTab: "التحقق من الموثوقية (QR / Hash)",
     formLawyer: "اسم المحامي / رقم القيد المهني",
+    lawyerPlaceholder: "مثال: المحامي أحمد السالم (رقم القيد 8492)",
     formLawyerEmail: "البريد الإلكتروني الرسمي للمحامي",
     formApplicant: "المدعي",
+    applicantPlaceholder: "اسم المدعي / الشركة",
     formRespondent: "المدعى عليه",
+    respondentPlaceholder: "اسم المدعى عليه / الجهة الحكومية",
     formCategory: "نوع الدعوى / التصنيف القانوني",
+    categories: [
+      "إجراء مستعجل (حجز تحفظي / وقف تنفيذ)",
+      "دعوى مدنية عادية",
+      "المنازعات الإدارية والضريبية",
+      "هابياس كورفوس / الحريات الدستورية"
+    ],
     formFile: "إرفاق المستند القانوني (PDF موثق)",
     formSubmit: "تقديم المستند وإنشاء Hash SHA-256",
     successTitle: "تم تقديم المستند وتوثيقه بنجاح",
@@ -186,7 +231,7 @@ export default function Home() {
     const formData = new FormData(e.currentTarget);
     const category = formData.get("category") as string;
 
-    const isUrgent = category.toLowerCase().includes("cautelar") || category.toLowerCase().includes("urgente") || category.toLowerCase().includes("habeas");
+    const isUrgent = category.toLowerCase().includes("cautelar") || category.toLowerCase().includes("urgent") || category.toLowerCase().includes("référé") || category.toLowerCase().includes("إجراء مستعجل");
 
     setTimeout(async () => {
       const newReceipt: Receipt = {
@@ -228,44 +273,44 @@ export default function Home() {
       protocolNumber: verifySearch.includes("CV-TJ") ? verifySearch : "CV-TJ-849201/2026",
       timestamp: new Date().toISOString(),
       hashSHA256: verifySearch.length > 20 ? verifySearch : generateSHA256(),
-      requerente: "Ministério Público / Estado de Cabo Verde",
+      requerente: "Ministério Público / State Authority",
       requerido: "Entidade Requerida S.A.",
-      tipoAcao: "Providência Cautela Unificada",
+      tipoAcao: "Providência Cautelar Unificada",
       urgencia: "ALTA",
       aiScore: 99.1,
     });
   };
 
   return (
-    <div dir={isRtl ? "rtl" : "ltr"} className="min-h-screen bg-gov-bgLight text-gov-navy font-sans pb-16">
+    <div dir={isRtl ? "rtl" : "ltr"} className="min-h-screen bg-[#F4F6F9] text-[#0B192C] font-sans pb-16">
       
       {/* Barra Institucional Superior */}
-      <header className="bg-gov-darkNavy border-b border-gov-gold/30 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
+      <header className="bg-[#070F1B] border-b border-[#C5A880]/30 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-gov-navy rounded-2xl border border-gov-gold/40 shadow-inner">
-            <Scale className="w-8 h-8 text-gov-gold animate-pulse" />
+          <div className="p-3 bg-[#0B192C] rounded-2xl border border-[#C5A880]/40 shadow-inner">
+            <Scale className="w-8 h-8 text-[#C5A880] animate-pulse" />
           </div>
           <div>
             <h1 className="font-serif text-xl md:text-2xl font-bold tracking-wider text-white">
               {t.title}
             </h1>
-            <p className="text-xs text-gov-gold uppercase tracking-widest font-semibold">
+            <p className="text-xs text-[#C5A880] uppercase tracking-widest font-semibold">
               {t.jurisdiction}
             </p>
           </div>
         </div>
 
         {/* Seletor Multilingue Institucional */}
-        <div className="flex items-center gap-2 bg-gov-navy/80 p-1.5 rounded-xl border border-gov-gold/30">
-          <Globe className="w-4 h-4 text-gov-gold ml-2" />
+        <div className="flex items-center gap-2 bg-[#0B192C]/80 p-1.5 rounded-xl border border-[#C5A880]/30">
+          <Globe className="w-4 h-4 text-[#C5A880] ml-2" />
           {(["pt", "en", "fr", "es", "ar"] as Language[]).map((l) => (
             <button
               key={l}
               onClick={() => setLang(l)}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all ${
                 lang === l
-                  ? "bg-gov-gold text-gov-darkNavy shadow-md"
-                  : "text-stone-300 hover:text-white hover:bg-gov-slate/50"
+                  ? "bg-[#C5A880] text-[#070F1B] shadow-md"
+                  : "text-stone-300 hover:text-white hover:bg-[#1E3E62]/50"
               }`}
             >
               {l}
@@ -276,13 +321,13 @@ export default function Home() {
 
       {/* Navegação Secundária por Abas */}
       <div className="max-w-6xl mx-auto px-6 mt-8">
-        <div className="flex flex-wrap gap-3 border-b border-gov-cardBorder pb-4">
+        <div className="flex flex-wrap gap-3 border-b border-[#E1E6ED] pb-4">
           <button
             onClick={() => setActiveTab("submit")}
             className={`px-6 py-3 rounded-xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-2 ${
               activeTab === "submit"
-                ? "bg-gov-navy text-gov-gold shadow-lg border border-gov-gold/40"
-                : "bg-white text-gov-navy border border-gov-cardBorder hover:bg-stone-100"
+                ? "bg-[#0B192C] text-[#C5A880] shadow-lg border border-[#C5A880]/40"
+                : "bg-white text-[#0B192C] border border-[#E1E6ED] hover:bg-stone-100"
             }`}
           >
             <Send className="w-4 h-4" />
@@ -293,8 +338,8 @@ export default function Home() {
             onClick={() => setActiveTab("dashboard")}
             className={`px-6 py-3 rounded-xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-2 ${
               activeTab === "dashboard"
-                ? "bg-gov-navy text-gov-gold shadow-lg border border-gov-gold/40"
-                : "bg-white text-gov-navy border border-gov-cardBorder hover:bg-stone-100"
+                ? "bg-[#0B192C] text-[#C5A880] shadow-lg border border-[#C5A880]/40"
+                : "bg-white text-[#0B192C] border border-[#E1E6ED] hover:bg-stone-100"
             }`}
           >
             <Building2 className="w-4 h-4" />
@@ -305,8 +350,8 @@ export default function Home() {
             onClick={() => setActiveTab("verify")}
             className={`px-6 py-3 rounded-xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-2 ${
               activeTab === "verify"
-                ? "bg-gov-navy text-gov-gold shadow-lg border border-gov-gold/40"
-                : "bg-white text-gov-navy border border-gov-cardBorder hover:bg-stone-100"
+                ? "bg-[#0B192C] text-[#C5A880] shadow-lg border border-[#C5A880]/40"
+                : "bg-white text-[#0B192C] border border-[#E1E6ED] hover:bg-stone-100"
             }`}
           >
             <QrCode className="w-4 h-4" />
@@ -318,9 +363,9 @@ export default function Home() {
       {/* CONTEÚDO PRINCIPAL: TAB SUBMISSÃO */}
       {activeTab === "submit" && (
         <main className="max-w-4xl mx-auto px-6 mt-8">
-          <div className="bg-white rounded-3xl border border-gov-cardBorder p-8 shadow-xl">
-            <div className="border-b border-gov-cardBorder pb-6 mb-6">
-              <h2 className="font-serif text-2xl font-bold text-gov-navy">
+          <div className="bg-white rounded-3xl border border-[#E1E6ED] p-8 shadow-xl">
+            <div className="border-b border-[#E1E6ED] pb-6 mb-6">
+              <h2 className="font-serif text-2xl font-bold text-[#0B192C]">
                 {t.submitTab}
               </h2>
               <p className="text-xs text-stone-500 mt-1">
@@ -342,29 +387,29 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-gov-bgLight rounded-2xl border border-gov-cardBorder text-xs font-mono">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-[#F4F6F9] rounded-2xl border border-[#E1E6ED] text-xs font-mono">
                   <div>
                     <span className="text-stone-400 block uppercase font-sans text-[10px]">{t.timestamp}</span>
-                    <span className="font-bold text-gov-navy">{receipt.timestamp}</span>
+                    <span className="font-bold text-[#0B192C]">{receipt.timestamp}</span>
                   </div>
                   <div>
                     <span className="text-stone-400 block uppercase font-sans text-[10px]">{t.urgencyLabel}</span>
                     <span className={`font-bold px-2 py-0.5 rounded text-[10px] uppercase ${
                       receipt.urgencia === "ALTA" ? "bg-red-100 text-red-700 border border-red-200" : "bg-emerald-100 text-emerald-700"
                     }`}>
-                      {receipt.urgencia} ({receipt.aiScore}% AI Urgency Confidence)
+                      {receipt.urgencia} ({receipt.aiScore}% AI Confidence)
                     </span>
                   </div>
                   <div className="md:col-span-2 pt-2 border-t border-stone-200">
                     <span className="text-stone-400 block uppercase font-sans text-[10px]">{t.hashLabel}</span>
-                    <span className="font-bold text-gov-slate break-all">{receipt.hashSHA256}</span>
+                    <span className="font-bold text-[#1E3E62] break-all">{receipt.hashSHA256}</span>
                   </div>
                 </div>
 
                 {/* Selo Holográfico e QR Code */}
-                <div className="p-6 bg-gov-darkNavy text-white rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 border border-gov-gold/40">
+                <div className="p-6 bg-[#070F1B] text-white rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 border border-[#C5A880]/40">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-gov-gold">
+                    <div className="flex items-center gap-2 text-[#C5A880]">
                       <ShieldCheck className="w-5 h-5" />
                       <span className="text-xs font-bold uppercase tracking-widest">Selo Holográfico de Imutabilidade</span>
                     </div>
@@ -373,7 +418,7 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="bg-white p-3 rounded-xl flex flex-col items-center gap-1 shadow-lg">
-                    <QrCode className="w-20 h-20 text-gov-darkNavy" />
+                    <QrCode className="w-20 h-20 text-[#070F1B]" />
                     <span className="text-[9px] font-mono text-stone-500 font-bold">VALIDAÇÃO IA</span>
                   </div>
                 </div>
@@ -381,7 +426,7 @@ export default function Home() {
                 <div className="flex gap-4 pt-4">
                   <button
                     onClick={() => window.print()}
-                    className="flex-1 bg-gov-navy text-gov-gold py-4 rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-gov-slate transition-all flex items-center justify-center gap-2 shadow-lg"
+                    className="flex-1 bg-[#0B192C] text-[#C5A880] py-4 rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-[#1E3E62] transition-all flex items-center justify-center gap-2 shadow-lg"
                   >
                     <Download className="w-4 h-4" />
                     {t.downloadReceipt}
@@ -389,7 +434,7 @@ export default function Home() {
 
                   <button
                     onClick={() => setReceipt(null)}
-                    className="px-6 bg-stone-200 text-gov-navy py-4 rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-stone-300 transition-all"
+                    className="px-6 bg-stone-200 text-[#0B192C] py-4 rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-stone-300 transition-all"
                   >
                     Nova Submissão
                   </button>
@@ -406,8 +451,8 @@ export default function Home() {
                       required
                       type="text"
                       name="lawyer"
-                      placeholder="Ex: Dr. Carlos Semedo (CP-CV 8492)"
-                      className="w-full px-4 py-3 rounded-xl border border-gov-cardBorder focus:outline-none focus:ring-2 focus:ring-gov-gold text-sm bg-stone-50/50"
+                      placeholder={t.lawyerPlaceholder}
+                      className="w-full px-4 py-3 rounded-xl border border-[#E1E6ED] focus:outline-none focus:ring-2 focus:ring-[#C5A880] text-sm bg-stone-50/50"
                     />
                   </div>
 
@@ -420,7 +465,7 @@ export default function Home() {
                       type="email"
                       name="lawyerEmail"
                       placeholder="advocacia@tribunal.cv"
-                      className="w-full px-4 py-3 rounded-xl border border-gov-cardBorder focus:outline-none focus:ring-2 focus:ring-gov-gold text-sm bg-stone-50/50"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E1E6ED] focus:outline-none focus:ring-2 focus:ring-[#C5A880] text-sm bg-stone-50/50"
                     />
                   </div>
                 </div>
@@ -434,8 +479,8 @@ export default function Home() {
                       required
                       type="text"
                       name="applicant"
-                      placeholder="Nome do Requerente / Empresa"
-                      className="w-full px-4 py-3 rounded-xl border border-gov-cardBorder focus:outline-none focus:ring-2 focus:ring-gov-gold text-sm bg-stone-50/50"
+                      placeholder={t.applicantPlaceholder}
+                      className="w-full px-4 py-3 rounded-xl border border-[#E1E6ED] focus:outline-none focus:ring-2 focus:ring-[#C5A880] text-sm bg-stone-50/50"
                     />
                   </div>
 
@@ -447,8 +492,8 @@ export default function Home() {
                       required
                       type="text"
                       name="respondent"
-                      placeholder="Nome do Requerido / Estado"
-                      className="w-full px-4 py-3 rounded-xl border border-gov-cardBorder focus:outline-none focus:ring-2 focus:ring-gov-gold text-sm bg-stone-50/50"
+                      placeholder={t.respondentPlaceholder}
+                      className="w-full px-4 py-3 rounded-xl border border-[#E1E6ED] focus:outline-none focus:ring-2 focus:ring-[#C5A880] text-sm bg-stone-50/50"
                     />
                   </div>
                 </div>
@@ -460,12 +505,11 @@ export default function Home() {
                   <select
                     required
                     name="category"
-                    className="w-full px-4 py-3 rounded-xl border border-gov-cardBorder focus:outline-none focus:ring-2 focus:ring-gov-gold text-sm bg-stone-50/50"
+                    className="w-full px-4 py-3 rounded-xl border border-[#E1E6ED] focus:outline-none focus:ring-2 focus:ring-[#C5A880] text-sm bg-stone-50/50"
                   >
-                    <option value="Providência Cautelar Urgente">Providência Cautelar Urgente (Apreensão / Suspensão)</option>
-                    <option value="Ação Ordinária Cível">Ação Ordinária Cível</option>
-                    <option value="Contencioso Administrativo">Contencioso Administrativo e Fiscal</option>
-                    <option value="Habeas Corpus / Garantias Constitucionais">Habeas Corpus / Garantias Constitucionais</option>
+                    {t.categories.map((cat, idx) => (
+                      <option key={idx} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -477,7 +521,7 @@ export default function Home() {
                     required
                     type="file"
                     accept=".pdf"
-                    className="w-full p-3 rounded-xl border border-dashed border-gov-slate/40 text-xs bg-stone-50"
+                    className="w-full p-3 rounded-xl border border-dashed border-[#1E3E62]/40 text-xs bg-stone-50"
                   />
                 </div>
 
@@ -485,7 +529,7 @@ export default function Home() {
                   <button
                     disabled={loading}
                     type="submit"
-                    className="w-full bg-gov-navy text-gov-gold py-4 rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-gov-slate transition-all flex items-center justify-center gap-2 shadow-xl border border-gov-gold/30"
+                    className="w-full bg-[#0B192C] text-[#C5A880] py-4 rounded-xl text-xs uppercase tracking-widest font-bold hover:bg-[#1E3E62] transition-all flex items-center justify-center gap-2 shadow-xl border border-[#C5A880]/30"
                   >
                     {loading ? "A Processar Triagem por IA..." : t.formSubmit}
                     <FileCheck2 className="w-4 h-4" />
@@ -501,17 +545,17 @@ export default function Home() {
       {activeTab === "dashboard" && (
         <main className="max-w-6xl mx-auto px-6 mt-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-3xl border border-gov-cardBorder shadow-sm flex items-center gap-4">
-              <div className="p-4 bg-gov-navy/10 rounded-2xl text-gov-navy">
+            <div className="bg-white p-6 rounded-3xl border border-[#E1E6ED] shadow-sm flex items-center gap-4">
+              <div className="p-4 bg-[#0B192C]/10 rounded-2xl text-[#0B192C]">
                 <Scale className="w-8 h-8" />
               </div>
               <div>
                 <span className="text-xs text-stone-500 uppercase tracking-wider font-bold">{t.totalCases}</span>
-                <h3 className="font-serif text-3xl font-bold text-gov-navy">1,284</h3>
+                <h3 className="font-serif text-3xl font-bold text-[#0B192C]">1,284</h3>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-gov-cardBorder shadow-sm flex items-center gap-4">
+            <div className="bg-white p-6 rounded-3xl border border-[#E1E6ED] shadow-sm flex items-center gap-4">
               <div className="p-4 bg-red-100 rounded-2xl text-red-700">
                 <AlertCircle className="w-8 h-8" />
               </div>
@@ -521,7 +565,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-gov-cardBorder shadow-sm flex items-center gap-4">
+            <div className="bg-white p-6 rounded-3xl border border-[#E1E6ED] shadow-sm flex items-center gap-4">
               <div className="p-4 bg-emerald-100 rounded-2xl text-emerald-800">
                 <Lock className="w-8 h-8" />
               </div>
@@ -537,9 +581,9 @@ export default function Home() {
       {/* CONTEÚDO: TAB VERIFICAÇÃO VERIFY */}
       {activeTab === "verify" && (
         <main className="max-w-3xl mx-auto px-6 mt-8">
-          <div className="bg-white rounded-3xl border border-gov-cardBorder p-8 shadow-xl space-y-6">
-            <div className="border-b border-gov-cardBorder pb-4">
-              <h2 className="font-serif text-2xl font-bold text-gov-navy">
+          <div className="bg-white rounded-3xl border border-[#E1E6ED] p-8 shadow-xl space-y-6">
+            <div className="border-b border-[#E1E6ED] pb-4">
+              <h2 className="font-serif text-2xl font-bold text-[#0B192C]">
                 {t.verifyTab}
               </h2>
             </div>
@@ -551,11 +595,11 @@ export default function Home() {
                 value={verifySearch}
                 onChange={(e) => setVerifySearch(e.target.value)}
                 placeholder={t.verifySearchPlaceholder}
-                className="flex-1 px-4 py-3 rounded-xl border border-gov-cardBorder focus:outline-none focus:ring-2 focus:ring-gov-gold text-sm"
+                className="flex-1 px-4 py-3 rounded-xl border border-[#E1E6ED] focus:outline-none focus:ring-2 focus:ring-[#C5A880] text-sm"
               />
               <button
                 type="submit"
-                className="bg-gov-navy text-gov-gold px-6 py-3 rounded-xl text-xs uppercase tracking-wider font-bold hover:bg-gov-slate transition-all flex items-center gap-2"
+                className="bg-[#0B192C] text-[#C5A880] px-6 py-3 rounded-xl text-xs uppercase tracking-wider font-bold hover:bg-[#1E3E62] transition-all flex items-center gap-2"
               >
                 <Search className="w-4 h-4" />
                 {t.verifyButton}
@@ -563,14 +607,14 @@ export default function Home() {
             </form>
 
             {verifiedResult && (
-              <div className="p-6 bg-gov-darkNavy text-white rounded-2xl space-y-4 border border-gov-gold/40 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 text-gov-gold">
+              <div className="p-6 bg-[#070F1B] text-white rounded-2xl space-y-4 border border-[#C5A880]/40 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 text-[#C5A880]">
                   <ShieldCheck className="w-6 h-6" />
                   <span className="font-bold text-sm uppercase tracking-widest">Documento Válido & Autenticado na Base Soberana</span>
                 </div>
                 <div className="text-xs space-y-1 font-mono text-stone-300">
                   <p>Protocolo: <span className="text-white font-bold">{verifiedResult.protocolNumber}</span></p>
-                  <p>Hash SHA-256: <span className="text-gov-gold break-all">{verifiedResult.hashSHA256}</span></p>
+                  <p>Hash SHA-256: <span className="text-[#C5A880] break-all">{verifiedResult.hashSHA256}</span></p>
                   <p>Ação: <span className="text-white">{verifiedResult.tipoAcao}</span></p>
                 </div>
               </div>
@@ -581,7 +625,7 @@ export default function Home() {
 
       {/* Rodapé Soberano */}
       <footer className="mt-16 text-center text-xs text-stone-500 space-y-1">
-        <p className="font-bold text-gov-navy">TRIBUNAL DIGITAL SOBERANO • SISTEMA DE JUSTIÇA DE ALTA PERFORMANCE</p>
+        <p className="font-bold text-[#0B192C]">TRIBUNAL DIGITAL SOBERANO • SISTEMA DE JUSTIÇA DE ALTA PERFORMANCE</p>
         <p>Desenvolvido para Infraestruturas Soberanas e Jurisdições Internacionais</p>
       </footer>
     </div>
