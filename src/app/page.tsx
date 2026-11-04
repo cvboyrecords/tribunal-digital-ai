@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Globe, ShieldCheck, FileCheck2, Send, Scale, Lock, CheckCircle2, QrCode, AlertCircle, Building2, Download, Search, Clock, Activity } from "lucide-react";
 
-type Language = "pt" | "en" | "fr" | "es" | "ar" | "cv";
+type Language = "cv" | "pt" | "en" | "fr" | "es" | "ar";
 
 interface Receipt {
   protocolNumber: string;
@@ -17,15 +17,55 @@ interface Receipt {
 }
 
 const timezones: Record<Language, { zone: string; label: string }> = {
+  cv: { zone: "Atlantic/Cape_Verde", label: "CVT (UTC-1) • Kabu Verdi" },
   pt: { zone: "Atlantic/Cape_Verde", label: "CVT (UTC-1) • Cabo Verde" },
   en: { zone: "UTC", label: "UTC (GMT) • Global Standard" },
   fr: { zone: "Europe/Paris", label: "CET (UTC+1) • Paris / Europe" },
   es: { zone: "Europe/Madrid", label: "CET (UTC+1) • Madrid / América" },
   ar: { zone: "Asia/Dubai", label: "GST (UTC+4) • Gulf Jurisdiction" },
-  cv: { zone: "Atlantic/Cape_Verde", label: "CVT (UTC-1) • Kabu Verdi" },
 };
 
 const translations = {
+  cv: {
+    title: "TRIBUNAL DIGITAL SOBERANU DI KABU VERDI",
+    subtitle: "Portal Internacional pa Entrega di Petiçon i Triajen pa Inteligénsia Artifisial",
+    jurisdiction: "REPÚBLIKA DI KABU VERDI • JURISDIÇÃO INTERNASIONAL",
+    serverOnline: "SERVIDOR SOBERANU ONLINE • KRIPTOGRAFIA SHA-256 ATIVU",
+    submitTab: "Entrega Petiçon Eletróniku",
+    dashboardTab: "Painel Judicial di Triajen",
+    verifyTab: "Verifikason di Otentisidadi (QR / Hash)",
+    formLawyer: "Nomi / Kédula Profissional di Avogadu",
+    lawyerPlaceholder: "Pur ezemplu: Dr. Carlos Semedo (CP-CV 8492)",
+    formLawyerEmail: "E-mail Institusional di Mandatáriu",
+    formApplicant: "Requerente (Autor)",
+    applicantPlaceholder: "Nomi di Requerente / Enpresa",
+    formRespondent: "Requerido (Réu)",
+    respondentPlaceholder: "Nomi di Requerido / Estado",
+    formCategory: "Tipu di Ason / Katigoria Jurídika",
+    categories: [
+      "Providensia Kautelar Urjenti (Apreenson / Suspenson)",
+      "Ason Ordinária Sível",
+      "Kontensioso Administrativu i Fiskal",
+      "Habeas Corpus / Garantias Konstitusionais"
+    ],
+    formFile: "Anexa Pesa Prosessual (PDF Otentikadu)",
+    formSubmit: "Entrega Petiçon i Xera Hash SHA-256",
+    successTitle: "Petiçon Entrigadu i Otentikadu ku Susesu",
+    protocol: "Nº di Protokolu Unifikadu",
+    timestamp: "Karinbu di Data/Hora (Timestamp Ofisial)",
+    hashLabel: "Hash di Imutabilidade SHA-256",
+    urgencyLabel: "Triajen Avtomatikua pa IA",
+    downloadReceipt: "Diskarga Resibu Judicial en PDF",
+    verifyNotice: "Kel dokumentu li foi encriptadu i rejistadu di forma imutável na bazi di dadus di Tribunal.",
+    verifySearchPlaceholder: "Introduzi Nº di Protokolu ô Hash SHA-256...",
+    verifyButton: "Verifika Otentisidadi",
+    dashTitle: "Kwadru Jeral di Prosessus i Triajen IA",
+    totalCases: "Total di Entradas Real",
+    urgentCases: "Providensias Kautelar (Urjenti)",
+    avgTime: "Tempu Médiu di Triajen IA",
+    noCasesYet: "Nenhum prosessu entridu di momento. Painel ta preenxe en tempu real dipôs di priméru entriga.",
+    noVerificationYet: "Ta aguarda konsulta di protokolu pa validason kriptográfiku na bazi soberanu.",
+  },
   pt: {
     title: "TRIBUNAL DIGITAL SOBERANO",
     subtitle: "Portal Internacional de Submissão Eletrónica e Triagem por Inteligência Artificial",
@@ -225,51 +265,11 @@ const translations = {
     avgTime: "متوسط وقت المعالجة",
     noCasesYet: "لم يتم تقديم أي قضية حتى الآن. ستتحدث اللوحة تلقائياً فور تقديم أول عريضة.",
     noVerificationYet: "في انتظار إدخال رقم البروتوكول للتحقق التشفيري.",
-  },
-  cv: {
-    title: "TRIBUNAL DIGITAL SOBERANU DI KABU VERDI",
-    subtitle: "Portal Internacional pa Entréga di Pediason i Triajen pa Inteligénsia Artifisial",
-    jurisdiction: "REPÚBLIKA DI KABU VERDI • JURISDIÇÃO INTERNASIONAL",
-    serverOnline: "SERVIDOR SOBERANU ONLINE • KRIPTOGRAFIA SHA-256 ATIVU",
-    submitTab: "Entriga Pediason Eletróniku",
-    dashboardTab: "Painel Judicial di Triajen",
-    verifyTab: "Verifikason di Otentisidadi (QR / Hash)",
-    formLawyer: "Nomi / Kédula Profissional di Avogadu",
-    lawyerPlaceholder: "Pur ezemplu: Dr. Carlos Semedo (CP-CV 8492)",
-    formLawyerEmail: "E-mail Institusional di Mandatáriu",
-    formApplicant: "Requerente (Autor)",
-    applicantPlaceholder: "Nomi di Requerente / Enpresa",
-    formRespondent: "Requerido (Réu)",
-    respondentPlaceholder: "Nomi di Requerido / Estado",
-    formCategory: "Tipu di Ason / Katigoria Jurídika",
-    categories: [
-      "Providensia Kautelar Urjenti (Apreenson / Suspenson)",
-      "Ason Ordinária Sível",
-      "Kontensioso Administrativu i Fiskal",
-      "Habeas Corpus / Garantias Konstitusionais"
-    ],
-    formFile: "Anexa Pesa Prosessual (PDF Otentikadu)",
-    formSubmit: "Entriga Pediason i Xera Hash SHA-256",
-    successTitle: "Pediason Entrigadu i Otentikadu ku Susesu",
-    protocol: "Nº di Protokolu Unifikadu",
-    timestamp: "Karinbu di Data/Hora (Timestamp Ofisial)",
-    hashLabel: "Hash di Imutabilidade SHA-256",
-    urgencyLabel: "Triajen Avtomatikua pa IA",
-    downloadReceipt: "Diskarga Resibu Judicial en PDF",
-    verifyNotice: "Kel dokumentu li foi encriptadu i rejistadu di forma imutável na bazi di dadus di Tribunal.",
-    verifySearchPlaceholder: "Introduzi Nº di Protokolu ô Hash SHA-256...",
-    verifyButton: "Verifika Otentisidadi",
-    dashTitle: "Kwadru Jeral di Prosessus i Triajen IA",
-    totalCases: "Total di Entradas Real",
-    urgentCases: "Providensias Kautelar (Urjenti)",
-    avgTime: "Tempu Médiu di Triajen IA",
-    noCasesYet: "Nenhum prosessu entridu di momento. Painel ta preenxe en tempu real dipôs di priméru entriga.",
-    noVerificationYet: "Ta aguarda konsulta di protokolu pa validason kriptográfiku na bazi soberanu.",
   }
 };
 
 export default function Home() {
-  const [lang, setLang] = useState<Language>("pt");
+  const [lang, setLang] = useState<Language>("cv");
   const [activeTab, setActiveTab] = useState<"submit" | "dashboard" | "verify">("submit");
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
@@ -410,10 +410,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Seletor Multilingue Institucional (PT, EN, FR, ES, AR, CV) */}
+        {/* Seletor Multilingue Institucional com CV em Primeira Posição */}
         <div className="flex items-center gap-1.5 bg-[#0B192C]/80 p-1.5 rounded-xl border border-[#C5A880]/30 flex-wrap">
           <Globe className="w-4 h-4 text-[#C5A880] ml-1" />
-          {(["pt", "en", "fr", "es", "ar", "cv"] as Language[]).map((l) => (
+          {(["cv", "pt", "en", "fr", "es", "ar"] as Language[]).map((l) => (
             <button
               key={l}
               onClick={() => setLang(l)}
