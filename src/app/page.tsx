@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Globe, ShieldCheck, FileCheck2, Send, Scale, Lock, CheckCircle2, QrCode, AlertCircle, Building2, Download, Search, Clock, Activity } from "lucide-react";
 
-type Language = "pt" | "en" | "fr" | "es" | "ar";
+type Language = "pt" | "en" | "fr" | "es" | "ar" | "cv";
 
 interface Receipt {
   protocolNumber: string;
@@ -22,6 +22,7 @@ const timezones: Record<Language, { zone: string; label: string }> = {
   fr: { zone: "Europe/Paris", label: "CET (UTC+1) • Paris / Europe" },
   es: { zone: "Europe/Madrid", label: "CET (UTC+1) • Madrid / América" },
   ar: { zone: "Asia/Dubai", label: "GST (UTC+4) • Gulf Jurisdiction" },
+  cv: { zone: "Atlantic/Cape_Verde", label: "CVT (UTC-1) • Kabu Verdi" },
 };
 
 const translations = {
@@ -119,7 +120,7 @@ const translations = {
     formApplicant: "Demandeur",
     applicantPlaceholder: "Nom du Demandeur / Société",
     formRespondent: "Défenseur",
-    respondentPlaceholder: "Nom du Défendeur / État",
+    respondentPlaceholder: "Nom du Défenseur / État",
     formCategory: "Nature de l'Action / Catégorie",
     categories: [
       "Référé d'Urgence (Saisie / Suspension)",
@@ -179,7 +180,7 @@ const translations = {
     verifySearchPlaceholder: "Introduzca el Nº de Protocolo o Hash SHA-256...",
     verifyButton: "Verificar Autenticidad",
     dashTitle: "Resumen General de Expedientes",
-    totalCases: "Total de Entradas Reales",
+    totalCases: "Total de Entradas Reais",
     urgentCases: "Medidas Cautelares Urgentes",
     avgTime: "Tiempo Medio de Triaje IA",
     noCasesYet: "No hay expedientes presentados todavía. El panel se actualizará en tiempo real tras la primera entrega.",
@@ -224,6 +225,46 @@ const translations = {
     avgTime: "متوسط وقت المعالجة",
     noCasesYet: "لم يتم تقديم أي قضية حتى الآن. ستتحدث اللوحة تلقائياً فور تقديم أول عريضة.",
     noVerificationYet: "في انتظار إدخال رقم البروتوكول للتحقق التشفيري.",
+  },
+  cv: {
+    title: "TRIBUNAL DIGITAL SOBERANU DI KABU VERDI",
+    subtitle: "Portal Internacional pa Entréga di Pediason i Triajen pa Inteligénsia Artifisial",
+    jurisdiction: "REPÚBLIKA DI KABU VERDI • JURISDIÇÃO INTERNASIONAL",
+    serverOnline: "SERVIDOR SOBERANU ONLINE • KRIPTOGRAFIA SHA-256 ATIVU",
+    submitTab: "Entriga Pediason Eletróniku",
+    dashboardTab: "Painel Judicial di Triajen",
+    verifyTab: "Verifikason di Otentisidadi (QR / Hash)",
+    formLawyer: "Nomi / Kédula Profissional di Avogadu",
+    lawyerPlaceholder: "Pur ezemplu: Dr. Carlos Semedo (CP-CV 8492)",
+    formLawyerEmail: "E-mail Institusional di Mandatáriu",
+    formApplicant: "Requerente (Autor)",
+    applicantPlaceholder: "Nomi di Requerente / Enpresa",
+    formRespondent: "Requerido (Réu)",
+    respondentPlaceholder: "Nomi di Requerido / Estado",
+    formCategory: "Tipu di Ason / Katigoria Jurídika",
+    categories: [
+      "Providensia Kautelar Urjenti (Apreenson / Suspenson)",
+      "Ason Ordinária Sível",
+      "Kontensioso Administrativu i Fiskal",
+      "Habeas Corpus / Garantias Konstitusionais"
+    ],
+    formFile: "Anexa Pesa Prosessual (PDF Otentikadu)",
+    formSubmit: "Entriga Pediason i Xera Hash SHA-256",
+    successTitle: "Pediason Entrigadu i Otentikadu ku Susesu",
+    protocol: "Nº di Protokolu Unifikadu",
+    timestamp: "Karinbu di Data/Hora (Timestamp Ofisial)",
+    hashLabel: "Hash di Imutabilidade SHA-256",
+    urgencyLabel: "Triajen Avtomatikua pa IA",
+    downloadReceipt: "Diskarga Resibu Judicial en PDF",
+    verifyNotice: "Kel dokumentu li foi encriptadu i rejistadu di forma imutável na bazi di dadus di Tribunal.",
+    verifySearchPlaceholder: "Introduzi Nº di Protokolu ô Hash SHA-256...",
+    verifyButton: "Verifika Otentisidadi",
+    dashTitle: "Kwadru Jeral di Prosessus i Triajen IA",
+    totalCases: "Total di Entradas Real",
+    urgentCases: "Providensias Kautelar (Urjenti)",
+    avgTime: "Tempu Médiu di Triajen IA",
+    noCasesYet: "Nenhum prosessu entridu di momento. Painel ta preenxe en tempu real dipôs di priméru entriga.",
+    noVerificationYet: "Ta aguarda konsulta di protokolu pa validason kriptográfiku na bazi soberanu.",
   }
 };
 
@@ -241,7 +282,6 @@ export default function Home() {
   const tz = timezones[lang];
   const isRtl = lang === "ar";
 
-  // Sincronização do Relógio Dinâmico por Fuso Horário
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
@@ -279,7 +319,7 @@ export default function Home() {
     const formData = new FormData(e.currentTarget);
     const category = formData.get("category") as string;
 
-    const isUrgent = category.toLowerCase().includes("cautelar") || category.toLowerCase().includes("urgent") || category.toLowerCase().includes("référé") || category.toLowerCase().includes("إجراء مستعجل");
+    const isUrgent = category.toLowerCase().includes("cautelar") || category.toLowerCase().includes("urgent") || category.toLowerCase().includes("référé") || category.toLowerCase().includes("providensia") || category.toLowerCase().includes("إجراء مستعجل");
 
     setTimeout(async () => {
       const newReceipt: Receipt = {
@@ -370,14 +410,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Seletor Multilingue Institucional */}
-        <div className="flex items-center gap-2 bg-[#0B192C]/80 p-1.5 rounded-xl border border-[#C5A880]/30">
-          <Globe className="w-4 h-4 text-[#C5A880] ml-2" />
-          {(["pt", "en", "fr", "es", "ar"] as Language[]).map((l) => (
+        {/* Seletor Multilingue Institucional (PT, EN, FR, ES, AR, CV) */}
+        <div className="flex items-center gap-1.5 bg-[#0B192C]/80 p-1.5 rounded-xl border border-[#C5A880]/30 flex-wrap">
+          <Globe className="w-4 h-4 text-[#C5A880] ml-1" />
+          {(["pt", "en", "fr", "es", "ar", "cv"] as Language[]).map((l) => (
             <button
               key={l}
               onClick={() => setLang(l)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all ${
+              className={`px-2.5 py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all ${
                 lang === l
                   ? "bg-[#C5A880] text-[#070F1B] shadow-md"
                   : "text-stone-300 hover:text-white hover:bg-[#1E3E62]/50"
@@ -674,10 +714,10 @@ export default function Home() {
                   <thead>
                     <tr className="border-b border-[#E1E6ED] text-stone-400 uppercase font-mono">
                       <th className="py-3 px-2">Protocolo</th>
-                      <th className="py-3 px-2">Data / Hora Official</th>
+                      <th className="py-3 px-2">Data / Hora Ofisial</th>
                       <th className="py-3 px-2">Requerente vs Requerido</th>
-                      <th className="py-3 px-2">Categoria</th>
-                      <th className="py-3 px-2">Urgência IA</th>
+                      <th className="py-3 px-2">Katigoria</th>
+                      <th className="py-3 px-2">Urjênsia IA</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E1E6ED] font-mono">
@@ -740,9 +780,9 @@ export default function Home() {
                 </div>
                 <div className="text-xs space-y-1 font-mono text-stone-300">
                   <p>Protocolo: <span className="text-white font-bold">{verifiedResult.protocolNumber}</span></p>
-                  <p>Data Oficial: <span className="text-white">{verifiedResult.timestamp}</span></p>
+                  <p>Data Ofisial: <span className="text-white">{verifiedResult.timestamp}</span></p>
                   <p>Hash SHA-256: <span className="text-[#C5A880] break-all">{verifiedResult.hashSHA256}</span></p>
-                  <p>Ação: <span className="text-white">{verifiedResult.tipoAcao}</span></p>
+                  <p>Ason: <span className="text-white">{verifiedResult.tipoAcao}</span></p>
                 </div>
               </div>
             ) : (
@@ -756,8 +796,8 @@ export default function Home() {
 
       {/* Rodapé Soberano */}
       <footer className="mt-16 text-center text-xs text-stone-500 space-y-1">
-        <p className="font-bold text-[#0B192C]">TRIBUNAL DIGITAL SOBERANO • SISTEMA DE JUSTIÇA DE ALTA PERFORMANCE</p>
-        <p>Desenvolvido para Infraestruturas Soberanas e Jurisdições Internacionais</p>
+        <p className="font-bold text-[#0B192C]">TRIBUNAL DIGITAL SOBERANO • SISTEMA DI JUSTIÇA DI ALTA PERFORMANCE</p>
+        <p> Dizinvolvidu pa Infraestruturas Soberanas i Jurisdiçones Internacionais</p>
       </footer>
     </div>
   );
