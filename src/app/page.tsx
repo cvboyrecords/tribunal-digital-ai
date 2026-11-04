@@ -34,7 +34,7 @@ const translations = {
     submitTab: "Entrega Petiçon Eletróniku",
     dashboardTab: "Painel Judicial di Triajen",
     verifyTab: "Verifikason di Otentisidadi (QR / Hash)",
-    formLawyer: "Nomi / Kédula Profissional di Avogadu",
+    formLawyer: "Nomi / Cédula Profissional di Avogadu",
     lawyerPlaceholder: "Pur ezemplu: Dr. Carlos Semedo (CP-CV 8492)",
     formLawyerEmail: "E-mail Institusional di Mandatáriu",
     formApplicant: "Requerente (Autor)",
@@ -44,7 +44,7 @@ const translations = {
     formCategory: "Tipu di Ason / Katigoria Jurídika",
     categories: [
       "Providensia Kautelar Urjenti (Apreenson / Suspenson)",
-      "Ason Ordinária Sível",
+      "Ason Ordinária Sensível",
       "Kontensioso Administrativu i Fiskal",
       "Habeas Corpus / Garantias Konstitusionais"
     ],
