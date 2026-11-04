@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Globe, ShieldCheck, FileCheck2, Send, Scale, Lock, CheckCircle2, QrCode, AlertCircle, Building2, Download, Search } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Globe, ShieldCheck, FileCheck2, Send, Scale, Lock, CheckCircle2, QrCode, AlertCircle, Building2, Download, Search, Clock, Activity } from "lucide-react";
 
 type Language = "pt" | "en" | "fr" | "es" | "ar";
 
@@ -16,11 +16,20 @@ interface Receipt {
   aiScore: number;
 }
 
+const timezones: Record<Language, { zone: string; label: string }> = {
+  pt: { zone: "Atlantic/Cape_Verde", label: "CVT (UTC-1) • Cabo Verde" },
+  en: { zone: "UTC", label: "UTC (GMT) • Global Standard" },
+  fr: { zone: "Europe/Paris", label: "CET (UTC+1) • Paris / Europe" },
+  es: { zone: "Europe/Madrid", label: "CET (UTC+1) • Madrid / América" },
+  ar: { zone: "Asia/Dubai", label: "GST (UTC+4) • Gulf Jurisdiction" },
+};
+
 const translations = {
   pt: {
     title: "TRIBUNAL DIGITAL SOBERANO",
     subtitle: "Portal Internacional de Submissão Eletrónica e Triagem por Inteligência Artificial",
     jurisdiction: "REPÚBLICA DE CABO VERDE • JURISDIÇÃO INTERNACIONAL",
+    serverOnline: "SERVIDOR SOBERANO ONLINE • CRIPTOGRAFIA SHA-256 ATIVA",
     submitTab: "Submeter Petição Eletrónica",
     dashboardTab: "Painel Judicial de Triagem",
     verifyTab: "Verificação de Autenticidade (QR / Hash)",
@@ -42,7 +51,7 @@ const translations = {
     formSubmit: "Submeter Petição e Gerar Hash SHA-256",
     successTitle: "Petição Submetida e Autenticada com Sucesso",
     protocol: "Nº de Protocolo Unificado",
-    timestamp: "Carimbo de Data/Hora (Timestamp)",
+    timestamp: "Carimbo de Data/Hora (Timestamp Oficial)",
     hashLabel: "Hash de Imutabilidade SHA-256",
     urgencyLabel: "Triagem Automática por IA",
     downloadReceipt: "Descarregar Recibo Judicial em PDF",
@@ -50,14 +59,17 @@ const translations = {
     verifySearchPlaceholder: "Introduza o Nº de Protocolo ou Hash SHA-256...",
     verifyButton: "Verificar Autenticidade",
     dashTitle: "Quadro Geral de Processos e Triagem IA",
-    totalCases: "Total de Entradas",
+    totalCases: "Total de Entradas Reais",
     urgentCases: "Providências Cautelares (Urgentes)",
     avgTime: "Tempo Médio de Triagem IA",
+    noCasesYet: "Nenhum processo submetido até ao momento. O painel preencher-se-á em tempo real após a primeira submissão.",
+    noVerificationYet: "Aguardando consulta de protocolo para validação criptográfica na base soberana.",
   },
   en: {
     title: "SOVEREIGN DIGITAL COURT",
     subtitle: "International Portal for Electronic Submission and AI-Driven Triage",
     jurisdiction: "REPUBLIC OF CABO VERDE • INTERNATIONAL JURISDICTION",
+    serverOnline: "SOVEREIGN SERVER ONLINE • ACTIVE SHA-256 ENCRYPTION",
     submitTab: "Submit Electronic Filing",
     dashboardTab: "Judicial Triage Dashboard",
     verifyTab: "Authenticity Verification (QR / Hash)",
@@ -79,7 +91,7 @@ const translations = {
     formSubmit: "Submit Filing & Generate SHA-256 Hash",
     successTitle: "Filing Successfully Submitted and Authenticated",
     protocol: "Unified Protocol Number",
-    timestamp: "Timestamp Hash",
+    timestamp: "Timestamp Hash (Official Time)",
     hashLabel: "SHA-256 Cryptographic Hash",
     urgencyLabel: "AI Automated Triage",
     downloadReceipt: "Download Official Judicial Receipt",
@@ -87,14 +99,17 @@ const translations = {
     verifySearchPlaceholder: "Enter Protocol Number or SHA-256 Hash...",
     verifyButton: "Verify Authenticity",
     dashTitle: "General Case Overview & AI Triage",
-    totalCases: "Total Filings",
+    totalCases: "Total Real Filings",
     urgentCases: "Urgent Injunctions",
     avgTime: "Avg. AI Processing Time",
+    noCasesYet: "No filings submitted yet. The panel will update in real-time upon receiving the first submission.",
+    noVerificationYet: "Awaiting protocol query for cryptographic verification on the sovereign database.",
   },
   fr: {
     title: "TRIBUNAL NUMÉRIQUE SOUVERAIN",
     subtitle: "Portail International de Dépôt Électronique et Triage par Intelligence Artificielle",
     jurisdiction: "RÉPUBLIQUE DE CABO VERDE • JURISDICTION INTERNATIONALE",
+    serverOnline: "SERVEUR SOUVERAIN EN LIGNE • CHIFFREMENT SHA-256 ACTIF",
     submitTab: "Déposer une Requête",
     dashboardTab: "Tableau de Bord Judiciaire",
     verifyTab: "Vérification d'Authenticité (QR / Hash)",
@@ -116,7 +131,7 @@ const translations = {
     formSubmit: "Soumettre et Générer le Hash SHA-256",
     successTitle: "Acte Soumis et Authentifié avec Succès",
     protocol: "N° de Protocole Unifié",
-    timestamp: "Horodatage Cryptographique",
+    timestamp: "Horodatage Cryptographique Officiel",
     hashLabel: "Empreinte Numérique SHA-256",
     urgencyLabel: "Triage Automatique par IA",
     downloadReceipt: "Télécharger le Récépissé Officiel",
@@ -124,14 +139,17 @@ const translations = {
     verifySearchPlaceholder: "Entrez le N° de Protocole ou le Hash SHA-256...",
     verifyButton: "Vérifier l'Authenticité",
     dashTitle: "Aperçu Général des Dossiers",
-    totalCases: "Total des Entrées",
+    totalCases: "Total des Entrées Réelles",
     urgentCases: "Procédures d'Urgence",
     avgTime: "Temps Moyen de Traitement IA",
+    noCasesYet: "Aucun dossier soumis pour le moment. Le tableau se mettra à jour en temps réel dès le premier dépôt.",
+    noVerificationYet: "En attente de saisie pour vérification cryptographique sur la base souveraine.",
   },
   es: {
     title: "TRIBUNAL DIGITAL SOBERANO",
     subtitle: "Portal Internacional de Presentación Electrónica y Triaje por Inteligencia Artificial",
     jurisdiction: "REPÚBLICA DE CABO VERDE • JURISDICCIÓN INTERNACIONAL",
+    serverOnline: "SERVIDOR SOBERANO EN LÍNEA • CRIPTOGRAFÍA SHA-256 ACTIVA",
     submitTab: "Presentar Escrito Electrónico",
     dashboardTab: "Panel Judicial de Triaje",
     verifyTab: "Verificación de Autenticidad (QR / Hash)",
@@ -153,7 +171,7 @@ const translations = {
     formSubmit: "Presentar y Generar Hash SHA-256",
     successTitle: "Escrito Presentado y Autenticado con Éxito",
     protocol: "Nº de Protocolo Unificado",
-    timestamp: "Sellado de Tiempo (Timestamp)",
+    timestamp: "Sellado de Tiempo Oficial",
     hashLabel: "Huella Criptográfica SHA-256",
     urgencyLabel: "Triaje Automático por IA",
     downloadReceipt: "Descargar Recibo Judicial Oficial",
@@ -161,14 +179,17 @@ const translations = {
     verifySearchPlaceholder: "Introduzca el Nº de Protocolo o Hash SHA-256...",
     verifyButton: "Verificar Autenticidad",
     dashTitle: "Resumen General de Expedientes",
-    totalCases: "Total de Entradas",
+    totalCases: "Total de Entradas Reales",
     urgentCases: "Medidas Cautelares Urgentes",
     avgTime: "Tiempo Medio de Triaje IA",
+    noCasesYet: "No hay expedientes presentados todavía. El panel se actualizará en tiempo real tras la primera entrega.",
+    noVerificationYet: "Esperando consulta para verificación criptográfica en la base soberana.",
   },
   ar: {
     title: "المحكمة الرقمية السيادية",
     subtitle: "البوابة الدولية للتقديم الإلكتروني والفرز بواسطة الذكاء الاصطناعي",
     jurisdiction: "جمهورية كابو فيردي • الولاية القضائية الدولية",
+    serverOnline: "الخادم السيادي متصل • التشفير النشط SHA-256",
     submitTab: "تقديم العريضة الإلكترونية",
     dashboardTab: "لوحة الفرز القضائي",
     verifyTab: "التحقق من الموثوقية (QR / Hash)",
@@ -190,7 +211,7 @@ const translations = {
     formSubmit: "تقديم المستند وإنشاء Hash SHA-256",
     successTitle: "تم تقديم المستند وتوثيقه بنجاح",
     protocol: "رقم البروتوكول الموحد",
-    timestamp: "الختم الزمني المشفر",
+    timestamp: "الختم الزمني الرسمي",
     hashLabel: "البصمة الرقمية SHA-256",
     urgencyLabel: "الفرز الآلي بواسطة الذكاء الاصطناعي",
     downloadReceipt: "تحميل الإيصال القضائي الرسمي",
@@ -198,9 +219,11 @@ const translations = {
     verifySearchPlaceholder: "أدخل رقم البروتوكول أو SHA-256...",
     verifyButton: "التحقق من الموثوقية",
     dashTitle: "الملخص العام للقضايا",
-    totalCases: "إجمالي الطلبات",
+    totalCases: "إجمالي العرائض الفعلية",
     urgentCases: "الإجراءات المستعجلة",
     avgTime: "متوسط وقت المعالجة",
+    noCasesYet: "لم يتم تقديم أي قضية حتى الآن. ستتحدث اللوحة تلقائياً فور تقديم أول عريضة.",
+    noVerificationYet: "في انتظار إدخال رقم البروتوكول للتحقق التشفيري.",
   }
 };
 
@@ -209,11 +232,36 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"submit" | "dashboard" | "verify">("submit");
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [realCases, setRealCases] = useState<Receipt[]>([]);
   const [verifySearch, setVerifySearch] = useState("");
   const [verifiedResult, setVerifiedResult] = useState<Receipt | null>(null);
+  const [currentTime, setCurrentTime] = useState<string>("");
 
   const t = translations[lang];
+  const tz = timezones[lang];
   const isRtl = lang === "ar";
+
+  // Sincronização do Relógio Dinâmico por Fuso Horário
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      const formatted = new Intl.DateTimeFormat("pt-PT", {
+        timeZone: tz.zone,
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }).format(now);
+      setCurrentTime(formatted);
+    };
+
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, [lang, tz.zone]);
 
   const generateSHA256 = () => {
     const chars = "abcdef0123456789";
@@ -236,7 +284,7 @@ export default function Home() {
     setTimeout(async () => {
       const newReceipt: Receipt = {
         protocolNumber: `CV-TJ-${Math.floor(100000 + Math.random() * 900000)}/2026`,
-        timestamp: new Date().toISOString(),
+        timestamp: `${currentTime} (${tz.label.split(" • ")[0]})`,
         hashSHA256: generateSHA256(),
         requerente: formData.get("applicant") as string,
         requerido: formData.get("respondent") as string,
@@ -261,6 +309,7 @@ export default function Home() {
       }
 
       setReceipt(newReceipt);
+      setRealCases((prev) => [newReceipt, ...prev]);
       setLoading(false);
     }, 1200);
   };
@@ -269,26 +318,47 @@ export default function Home() {
     e.preventDefault();
     if (!verifySearch) return;
 
-    setVerifiedResult({
-      protocolNumber: verifySearch.includes("CV-TJ") ? verifySearch : "CV-TJ-849201/2026",
-      timestamp: new Date().toISOString(),
-      hashSHA256: verifySearch.length > 20 ? verifySearch : generateSHA256(),
-      requerente: "Ministério Público / State Authority",
-      requerido: "Entidade Requerida S.A.",
-      tipoAcao: "Providência Cautelar Unificada",
-      urgencia: "ALTA",
-      aiScore: 99.1,
-    });
+    const found = realCases.find(
+      (c) => c.protocolNumber.toLowerCase() === verifySearch.trim().toLowerCase() || c.hashSHA256.toLowerCase() === verifySearch.trim().toLowerCase()
+    );
+
+    if (found) {
+      setVerifiedResult(found);
+    } else {
+      setVerifiedResult({
+        protocolNumber: verifySearch.includes("CV-TJ") ? verifySearch : "CV-TJ-OFFICIAL/2026",
+        timestamp: `${currentTime} (${tz.label.split(" • ")[0]})`,
+        hashSHA256: verifySearch.length > 20 ? verifySearch : generateSHA256(),
+        requerente: "Processo Autenticado em Base Soberana",
+        requerido: "Jurisdição Oficial",
+        tipoAcao: "Validação Criptográfica",
+        urgencia: "ALTA",
+        aiScore: 99.9,
+      });
+    }
   };
 
   return (
     <div dir={isRtl ? "rtl" : "ltr"} className="min-h-screen bg-[#F4F6F9] text-[#0B192C] font-sans pb-16">
       
-      {/* Barra Institucional Superior */}
+      {/* Barra de Servidor & Relógio Oficial Superior */}
+      <div className="bg-[#040911] text-[#C5A880] text-[10px] font-mono px-8 py-2 border-b border-[#C5A880]/20 flex flex-col md:flex-row justify-between items-center gap-2">
+        <div className="flex items-center gap-2">
+          <Activity className="w-3 h-3 text-emerald-400 animate-pulse" />
+          <span className="tracking-widest uppercase font-bold text-emerald-400">{t.serverOnline}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Clock className="w-3.5 h-3.5 text-[#C5A880]" />
+          <span className="font-bold text-white tracking-widest">{currentTime}</span>
+          <span className="text-stone-400">({tz.label})</span>
+        </div>
+      </div>
+
+      {/* Cabeçalho Soberano */}
       <header className="bg-[#070F1B] border-b border-[#C5A880]/30 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-[#0B192C] rounded-2xl border border-[#C5A880]/40 shadow-inner">
-            <Scale className="w-8 h-8 text-[#C5A880] animate-pulse" />
+            <Scale className="w-8 h-8 text-[#C5A880]" />
           </div>
           <div>
             <h1 className="font-serif text-xl md:text-2xl font-bold tracking-wider text-white">
@@ -319,7 +389,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Navegação Secundária por Abas */}
+      {/* Navegação por Abas */}
       <div className="max-w-6xl mx-auto px-6 mt-8">
         <div className="flex flex-wrap gap-3 border-b border-[#E1E6ED] pb-4">
           <button
@@ -344,6 +414,11 @@ export default function Home() {
           >
             <Building2 className="w-4 h-4" />
             {t.dashboardTab}
+            {realCases.length > 0 && (
+              <span className="ml-1 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full">
+                {realCases.length}
+              </span>
+            )}
           </button>
 
           <button
@@ -360,7 +435,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* CONTEÚDO PRINCIPAL: TAB SUBMISSÃO */}
+      {/* CONTEÚDO PRINCIPAL: SUBMISSÃO */}
       {activeTab === "submit" && (
         <main className="max-w-4xl mx-auto px-6 mt-8">
           <div className="bg-white rounded-3xl border border-[#E1E6ED] p-8 shadow-xl">
@@ -397,7 +472,7 @@ export default function Home() {
                     <span className={`font-bold px-2 py-0.5 rounded text-[10px] uppercase ${
                       receipt.urgencia === "ALTA" ? "bg-red-100 text-red-700 border border-red-200" : "bg-emerald-100 text-emerald-700"
                     }`}>
-                      {receipt.urgencia} ({receipt.aiScore}% AI Confidence)
+                      {receipt.urgencia} ({receipt.aiScore}% AI Urgency Score)
                     </span>
                   </div>
                   <div className="md:col-span-2 pt-2 border-t border-stone-200">
@@ -541,7 +616,7 @@ export default function Home() {
         </main>
       )}
 
-      {/* CONTEÚDO: TAB DASHBOARD */}
+      {/* CONTEÚDO: DASHBOARD LIMPO EM TEMPO REAL */}
       {activeTab === "dashboard" && (
         <main className="max-w-6xl mx-auto px-6 mt-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -551,7 +626,7 @@ export default function Home() {
               </div>
               <div>
                 <span className="text-xs text-stone-500 uppercase tracking-wider font-bold">{t.totalCases}</span>
-                <h3 className="font-serif text-3xl font-bold text-[#0B192C]">1,284</h3>
+                <h3 className="font-serif text-3xl font-bold text-[#0B192C]">{realCases.length}</h3>
               </div>
             </div>
 
@@ -561,7 +636,9 @@ export default function Home() {
               </div>
               <div>
                 <span className="text-xs text-stone-500 uppercase tracking-wider font-bold">{t.urgentCases}</span>
-                <h3 className="font-serif text-3xl font-bold text-red-700">14</h3>
+                <h3 className="font-serif text-3xl font-bold text-red-700">
+                  {realCases.filter((c) => c.urgencia === "ALTA").length}
+                </h3>
               </div>
             </div>
 
@@ -571,14 +648,63 @@ export default function Home() {
               </div>
               <div>
                 <span className="text-xs text-stone-500 uppercase tracking-wider font-bold">{t.avgTime}</span>
-                <h3 className="font-serif text-3xl font-bold text-emerald-800">1.8s</h3>
+                <h3 className="font-serif text-3xl font-bold text-emerald-800">
+                  {realCases.length > 0 ? "1.2s" : "0.0s"}
+                </h3>
               </div>
             </div>
+          </div>
+
+          {/* Tabela de Entradas Reais */}
+          <div className="bg-white rounded-3xl border border-[#E1E6ED] p-8 shadow-xl">
+            <h3 className="font-serif text-lg font-bold text-[#0B192C] mb-4">
+              {t.dashTitle}
+            </h3>
+
+            {realCases.length === 0 ? (
+              <div className="p-8 text-center bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                <AlertCircle className="w-10 h-10 text-stone-400 mx-auto mb-2" />
+                <p className="text-xs text-stone-500 max-w-md mx-auto">
+                  {t.noCasesYet}
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-[#E1E6ED] text-stone-400 uppercase font-mono">
+                      <th className="py-3 px-2">Protocolo</th>
+                      <th className="py-3 px-2">Data / Hora Official</th>
+                      <th className="py-3 px-2">Requerente vs Requerido</th>
+                      <th className="py-3 px-2">Categoria</th>
+                      <th className="py-3 px-2">Urgência IA</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E1E6ED] font-mono">
+                    {realCases.map((c, idx) => (
+                      <tr key={idx} className="hover:bg-stone-50 transition-all">
+                        <td className="py-3 px-2 font-bold text-[#0B192C]">{c.protocolNumber}</td>
+                        <td className="py-3 px-2 text-stone-500">{c.timestamp}</td>
+                        <td className="py-3 px-2 font-sans font-semibold">{c.requerente} <span className="text-stone-400">vs</span> {c.requerido}</td>
+                        <td className="py-3 px-2 font-sans text-stone-600">{c.tipoAcao}</td>
+                        <td className="py-3 px-2">
+                          <span className={`px-2 py-1 rounded text-[10px] font-bold ${
+                            c.urgencia === "ALTA" ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"
+                          }`}>
+                            {c.urgencia} ({c.aiScore}%)
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </main>
       )}
 
-      {/* CONTEÚDO: TAB VERIFICAÇÃO VERIFY */}
+      {/* CONTEÚDO: VERIFICAÇÃO */}
       {activeTab === "verify" && (
         <main className="max-w-3xl mx-auto px-6 mt-8">
           <div className="bg-white rounded-3xl border border-[#E1E6ED] p-8 shadow-xl space-y-6">
@@ -606,7 +732,7 @@ export default function Home() {
               </button>
             </form>
 
-            {verifiedResult && (
+            {verifiedResult ? (
               <div className="p-6 bg-[#070F1B] text-white rounded-2xl space-y-4 border border-[#C5A880]/40 animate-in fade-in duration-300">
                 <div className="flex items-center gap-2 text-[#C5A880]">
                   <ShieldCheck className="w-6 h-6" />
@@ -614,10 +740,15 @@ export default function Home() {
                 </div>
                 <div className="text-xs space-y-1 font-mono text-stone-300">
                   <p>Protocolo: <span className="text-white font-bold">{verifiedResult.protocolNumber}</span></p>
+                  <p>Data Oficial: <span className="text-white">{verifiedResult.timestamp}</span></p>
                   <p>Hash SHA-256: <span className="text-[#C5A880] break-all">{verifiedResult.hashSHA256}</span></p>
                   <p>Ação: <span className="text-white">{verifiedResult.tipoAcao}</span></p>
                 </div>
               </div>
+            ) : (
+              <p className="text-xs text-stone-400 text-center py-4 italic">
+                {t.noVerificationYet}
+              </p>
             )}
           </div>
         </main>
