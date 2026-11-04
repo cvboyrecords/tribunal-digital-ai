@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #F4F6F9;
+  color: #0B192C;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+[dir="rtl"] {
+  text-align: right;
+}
